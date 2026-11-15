@@ -25,6 +25,7 @@ public struct KanjiCharacter: Identifiable, Codable {
     public let kunyomi: String         // e.g. "ひ, -び, -か"
     public let meaningVi: String       // e.g. "Ngày, Mặt trời"
     public let strokeCount: Int        // e.g. 4
+    public let jlptLevel: String       // e.g. "N5" hoặc "N4"
     public let examples: [KanjiExample]
     
     public init(
@@ -34,15 +35,17 @@ public struct KanjiCharacter: Identifiable, Codable {
         kunyomi: String,
         meaningVi: String,
         strokeCount: Int,
+        jlptLevel: String = "N5",
         examples: [KanjiExample]
     ) {
-        self.id = "kanji_\(kanji)"
+        self.id = "kanji_\(jlptLevel.lowercased())_\(kanji)"
         self.kanji = kanji
         self.hanViet = hanViet
         self.onyomi = onyomi
         self.kunyomi = kunyomi
         self.meaningVi = meaningVi
         self.strokeCount = strokeCount
+        self.jlptLevel = jlptLevel
         self.examples = examples
     }
 }

@@ -34,6 +34,20 @@
 		CEDBB000308B9712003ED205 /* StatsHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDBA000308B9712003ED205 /* StatsHeaderView.swift */; };
 		CEDBB000308B9712003ED206 /* VocabFlashcardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDBA000308B9712003ED206 /* VocabFlashcardViewController.swift */; };
 		CEDBB000308B9712003ED207 /* VocabQuizViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDBA000308B9712003ED207 /* VocabQuizViewController.swift */; };
+		CEDBB000308B9712003ED208 /* VocabLessonListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDBA000308B9712003ED208 /* VocabLessonListViewController.swift */; };
+		CEDBB000308B9712003ED301 /* GrammarModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDBA000308B9712003ED301 /* GrammarModel.swift */; };
+		CEDBB000308B9712003ED302 /* GrammarRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDBA000308B9712003ED302 /* GrammarRepository.swift */; };
+		CEDBB000308B9712003ED303 /* GrammarFlashcardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDBA000308B9712003ED303 /* GrammarFlashcardView.swift */; };
+		CEDBB000308B9712003ED304 /* GrammarLessonListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDBA000308B9712003ED304 /* GrammarLessonListViewController.swift */; };
+		CEDBB000308B9712003ED305 /* GrammarFlashcardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDBA000308B9712003ED305 /* GrammarFlashcardViewController.swift */; };
+		CEDBB000308B9712003ED306 /* GrammarQuizViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDBA000308B9712003ED306 /* GrammarQuizViewController.swift */; };
+		CEDBB000308B9712003ED401 /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDBA000308B9712003ED401 /* SearchViewController.swift */; };
+		CEDBB000308B9712003ED402 /* NeedReviewWordsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDBA000308B9712003ED402 /* NeedReviewWordsViewController.swift */; };
+		CEDBB000308B9712003ED403 /* VocabTestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDBA000308B9712003ED403 /* VocabTestViewController.swift */; };
+		CEDBB000308B9712003ED404 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDBA000308B9712003ED404 /* NotificationService.swift */; };
+		CEDBB000308B9712003ED601 /* JLPTMockTestModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDBA000308B9712003ED601 /* JLPTMockTestModel.swift */; };
+		CEDBB000308B9712003ED602 /* JLPTMockTestRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDBA000308B9712003ED602 /* JLPTMockTestRepository.swift */; };
+		CEDBB000308B9712003ED603 /* JLPTMockTestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDBA000308B9712003ED603 /* JLPTMockTestViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -85,6 +99,20 @@
 		CEDBA000308B9712003ED205 /* StatsHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/StatsHeaderView.swift"; sourceTree = "<group>"; };
 		CEDBA000308B9712003ED206 /* VocabFlashcardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Controllers/VocabFlashcardViewController.swift"; sourceTree = "<group>"; };
 		CEDBA000308B9712003ED207 /* VocabQuizViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Controllers/VocabQuizViewController.swift"; sourceTree = "<group>"; };
+		CEDBA000308B9712003ED208 /* VocabLessonListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Controllers/VocabLessonListViewController.swift"; sourceTree = "<group>"; };
+		CEDBA000308B9712003ED301 /* GrammarModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models/GrammarModel.swift"; sourceTree = "<group>"; };
+		CEDBA000308B9712003ED302 /* GrammarRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Services/GrammarRepository.swift"; sourceTree = "<group>"; };
+		CEDBA000308B9712003ED303 /* GrammarFlashcardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/GrammarFlashcardView.swift"; sourceTree = "<group>"; };
+		CEDBA000308B9712003ED304 /* GrammarLessonListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Controllers/GrammarLessonListViewController.swift"; sourceTree = "<group>"; };
+		CEDBA000308B9712003ED305 /* GrammarFlashcardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Controllers/GrammarFlashcardViewController.swift"; sourceTree = "<group>"; };
+		CEDBA000308B9712003ED306 /* GrammarQuizViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Controllers/GrammarQuizViewController.swift"; sourceTree = "<group>"; };
+		CEDBA000308B9712003ED401 /* SearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Controllers/SearchViewController.swift"; sourceTree = "<group>"; };
+		CEDBA000308B9712003ED402 /* NeedReviewWordsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Controllers/NeedReviewWordsViewController.swift"; sourceTree = "<group>"; };
+		CEDBA000308B9712003ED403 /* VocabTestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Controllers/VocabTestViewController.swift"; sourceTree = "<group>"; };
+		CEDBA000308B9712003ED404 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Services/NotificationService.swift"; sourceTree = "<group>"; };
+		CEDBA000308B9712003ED601 /* JLPTMockTestModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models/JLPTMockTestModel.swift"; sourceTree = "<group>"; };
+		CEDBA000308B9712003ED602 /* JLPTMockTestRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Services/JLPTMockTestRepository.swift"; sourceTree = "<group>"; };
+		CEDBA000308B9712003ED603 /* JLPTMockTestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Controllers/JLPTMockTestViewController.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -135,6 +163,19 @@
 		CEDB6C13308B9712003ED670 /* AppHocTiengNhat */ = {
 			isa = PBXGroup;
 			children = (
+												CEDBA000308B9712003ED601 /* JLPTMockTestModel.swift */,
+				CEDBA000308B9712003ED602 /* JLPTMockTestRepository.swift */,
+				CEDBA000308B9712003ED603 /* JLPTMockTestViewController.swift */,
+				CEDBA000308B9712003ED401 /* SearchViewController.swift */,
+				CEDBA000308B9712003ED402 /* NeedReviewWordsViewController.swift */,
+				CEDBA000308B9712003ED403 /* VocabTestViewController.swift */,
+				CEDBA000308B9712003ED404 /* NotificationService.swift */,
+				CEDBA000308B9712003ED301 /* GrammarModel.swift */,
+				CEDBA000308B9712003ED302 /* GrammarRepository.swift */,
+				CEDBA000308B9712003ED303 /* GrammarFlashcardView.swift */,
+				CEDBA000308B9712003ED304 /* GrammarLessonListViewController.swift */,
+				CEDBA000308B9712003ED305 /* GrammarFlashcardViewController.swift */,
+				CEDBA000308B9712003ED306 /* GrammarQuizViewController.swift */,
 				CEDBA000308B9712003ED201 /* VocabWord.swift */,
 				CEDBA000308B9712003ED202 /* ProgressService.swift */,
 				CEDBA000308B9712003ED203 /* VocabRepository.swift */,
@@ -142,6 +183,7 @@
 				CEDBA000308B9712003ED205 /* StatsHeaderView.swift */,
 				CEDBA000308B9712003ED206 /* VocabFlashcardViewController.swift */,
 				CEDBA000308B9712003ED207 /* VocabQuizViewController.swift */,
+				CEDBA000308B9712003ED208 /* VocabLessonListViewController.swift */,
 				CEDBA000308B9712003ED101 /* KanjiCharacter.swift */,
 				CEDBA000308B9712003ED102 /* KanjiRepository.swift */,
 				CEDBA000308B9712003ED103 /* KanjiFlashcardView.swift */,
@@ -312,6 +354,19 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+												CEDBB000308B9712003ED601 /* JLPTMockTestModel.swift in Sources */,
+				CEDBB000308B9712003ED602 /* JLPTMockTestRepository.swift in Sources */,
+				CEDBB000308B9712003ED603 /* JLPTMockTestViewController.swift in Sources */,
+				CEDBB000308B9712003ED401 /* SearchViewController.swift in Sources */,
+				CEDBB000308B9712003ED402 /* NeedReviewWordsViewController.swift in Sources */,
+				CEDBB000308B9712003ED403 /* VocabTestViewController.swift in Sources */,
+				CEDBB000308B9712003ED404 /* NotificationService.swift in Sources */,
+				CEDBB000308B9712003ED301 /* GrammarModel.swift in Sources */,
+				CEDBB000308B9712003ED302 /* GrammarRepository.swift in Sources */,
+				CEDBB000308B9712003ED303 /* GrammarFlashcardView.swift in Sources */,
+				CEDBB000308B9712003ED304 /* GrammarLessonListViewController.swift in Sources */,
+				CEDBB000308B9712003ED305 /* GrammarFlashcardViewController.swift in Sources */,
+				CEDBB000308B9712003ED306 /* GrammarQuizViewController.swift in Sources */,
 				CEDBB000308B9712003ED201 /* VocabWord.swift in Sources */,
 				CEDBB000308B9712003ED202 /* ProgressService.swift in Sources */,
 				CEDBB000308B9712003ED203 /* VocabRepository.swift in Sources */,
@@ -319,6 +374,7 @@
 				CEDBB000308B9712003ED205 /* StatsHeaderView.swift in Sources */,
 				CEDBB000308B9712003ED206 /* VocabFlashcardViewController.swift in Sources */,
 				CEDBB000308B9712003ED207 /* VocabQuizViewController.swift in Sources */,
+				CEDBB000308B9712003ED208 /* VocabLessonListViewController.swift in Sources */,
 				CEDBB000308B9712003ED101 /* KanjiCharacter.swift in Sources */,
 				CEDBB000308B9712003ED102 /* KanjiRepository.swift in Sources */,
 				CEDBB000308B9712003ED103 /* KanjiFlashcardView.swift in Sources */,

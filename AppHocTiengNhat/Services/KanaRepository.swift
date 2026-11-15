@@ -156,4 +156,8 @@ public final class KanaRepository {
             return katakanaList
         }
     }
+
+    public func getAllCharacters(for type: KanaType) -> [KanaCharacter] {
+        return getCharacters(for: type)
+    }
 }

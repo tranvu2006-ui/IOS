@@ -15,11 +15,76 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Tiếng Nhật N5"
-        navigationController?.navigationBar.prefersLargeTitles = true
+        title = "Tiếng Nhật N5 & N4"
+        navigationController?.navigationBar.prefersLargeTitles = false
+        navigationItem.titleView = makeBrandTitleView()
         view.backgroundColor = .systemGroupedBackground
         
+        setupNavButtons()
         setupViews()
+    }
+
+    private func makeBrandTitleView() -> UIView {
+        let logoView = UIImageView(image: UIImage(named: "AppLogo"))
+        logoView.contentMode = .scaleAspectFit
+        logoView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            logoView.widthAnchor.constraint(equalToConstant: 30),
+            logoView.heightAnchor.constraint(equalToConstant: 30)
+        ])
+
+        let titleLabel = UILabel()
+        titleLabel.text = "Tiếng Nhật N5 & N4"
+        titleLabel.font = .systemFont(ofSize: 18, weight: .bold)
+        titleLabel.textColor = .label
+
+        let brandView = UIStackView(arrangedSubviews: [logoView, titleLabel])
+        brandView.axis = .horizontal
+        brandView.alignment = .center
+        brandView.spacing = 8
+        brandView.isAccessibilityElement = true
+        brandView.accessibilityLabel = "Tiếng Nhật N5 & N4"
+        logoView.isAccessibilityElement = false
+        titleLabel.isAccessibilityElement = false
+        return brandView
+    }
+
+    private func setupNavButtons() {
+        let searchBtn = UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(handleSearchTap))
+        let bellBtn = UIBarButtonItem(image: UIImage(systemName: "bell.badge.fill"), style: .plain, target: self, action: #selector(handleNotificationTap))
+        bellBtn.tintColor = .systemOrange
+        navigationItem.rightBarButtonItems = [searchBtn, bellBtn]
+    }
+
+    @objc private func handleSearchTap() {
+        let vc = SearchViewController()
+        navigationController?.pushViewController(vc, animated: true)
+    }
+
+    @objc private func handleNotificationTap() {
+        let alert = UIAlertController(
+            title: "Nhắc nhở học tập 🔥",
+            message: "Hệ thống sẽ gửi thông báo mỗi tối để nhắc bạn luyện tập Flashcard và duy trì chuỗi Streak!",
+            preferredStyle: .actionSheet
+        )
+        alert.addAction(UIAlertAction(title: "⏰ Bật nhắc nhở học 20:00 hàng ngày", style: .default, handler: { [weak self] _ in
+            NotificationService.shared.requestAuthorization { granted in
+                let notice = UIAlertController(
+                    title: granted ? "Đã kích hoạt! 🔔" : "Chưa cấp quyền",
+                    message: granted ? "Đã cài đặt chuông nhắc học tiếng Nhật lúc 20:00 mỗi tối." : "Vui lòng cấp quyền thông báo trong Cài đặt của máy.",
+                    preferredStyle: .alert
+                )
+                notice.addAction(UIAlertAction(title: "OK", style: .default))
+                self?.present(notice, animated: true)
+            }
+        }))
+        alert.addAction(UIAlertAction(title: "⚡ Gửi thử thông báo (sau 3 giây)", style: .default, handler: { _ in
+            NotificationService.shared.requestAuthorization { _ in
+                NotificationService.shared.sendTestNotification()
+            }
+        }))
+        alert.addAction(UIAlertAction(title: "Đóng", style: .cancel))
+        present(alert, animated: true)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -50,6 +115,10 @@ class ViewController: UIViewController {
         // 0. Stats Header
         statsHeader.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(statsHeader)
+
+        // 0.1 Quick Search Bar
+        let searchBarCard = createSearchQuickBar()
+        contentView.addSubview(searchBarCard)
         
         // 1. Hiragana Section Card
         let hiraganaCard = createKanaSectionCard(
@@ -69,15 +138,27 @@ class ViewController: UIViewController {
         )
         contentView.addSubview(katakanaCard)
         
-        // 3. Kanji N5 Card
+        // 3. Kanji N5 & N4 Card
         let kanjiCard = createKanjiSectionCard(
-            title: "Hán tự Kanji N5 (漢字)",
-            subtitle: "Học chữ Hán qua âm Hán Việt, âm On/Kun và luyện nghe từ vựng.",
+            title: "Hán tự Kanji N5 & N4 (漢字)",
+            subtitle: "68 chữ Hán trọng tâm cấp độ N5 (27 chữ) và N4 (41 chữ) kèm âm Hán Việt, On/Kun, số nét và từ ghép.",
             accentColor: .systemOrange
         )
         contentView.addSubview(kanjiCard)
         
-        // 4. Vocabulary by Topics Card
+        // 4. Grammar N5 & N4 (50 Lessons Minna no Nihongo) Card
+        let grammarCard = createGrammarSectionCard(
+            title: "Ngữ pháp N5 & N4 - 50 Bài Minna no Nihongo (文法)",
+            subtitle: "Đầy đủ 50 bài N5 (Bài 1-25) & N4 (Bài 26-50): Hệ thống trợ từ, Chia thể động từ (て, ない, 辞書, た, Khả năng, Ý chí, Điều kiện, Bị động, Sai khiến, Kính ngữ) & 150 bài tập trắc nghiệm.",
+            accentColor: .systemTeal
+        )
+        contentView.addSubview(grammarCard)
+
+        // 5. Test Center Card (Kiểm tra Ngữ pháp, Từ vựng & Sổ tay từ chưa nhớ)
+        let testCenterCard = createTestCenterSectionCard()
+        contentView.addSubview(testCenterCard)
+        
+        // 6. Vocabulary by Topics Card (50 Bài Minna & Chủ đề)
         let vocabCard = createVocabTopicsSectionCard()
         contentView.addSubview(vocabCard)
         
@@ -85,8 +166,12 @@ class ViewController: UIViewController {
             statsHeader.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
             statsHeader.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             statsHeader.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
+
+            searchBarCard.topAnchor.constraint(equalTo: statsHeader.bottomAnchor, constant: 14),
+            searchBarCard.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+            searchBarCard.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
             
-            hiraganaCard.topAnchor.constraint(equalTo: statsHeader.bottomAnchor, constant: 20),
+            hiraganaCard.topAnchor.constraint(equalTo: searchBarCard.bottomAnchor, constant: 16),
             hiraganaCard.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             hiraganaCard.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
             
@@ -98,11 +183,236 @@ class ViewController: UIViewController {
             kanjiCard.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             kanjiCard.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
             
-            vocabCard.topAnchor.constraint(equalTo: kanjiCard.bottomAnchor, constant: 20),
+            grammarCard.topAnchor.constraint(equalTo: kanjiCard.bottomAnchor, constant: 20),
+            grammarCard.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+            grammarCard.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
+
+            testCenterCard.topAnchor.constraint(equalTo: grammarCard.bottomAnchor, constant: 20),
+            testCenterCard.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+            testCenterCard.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
+            
+            vocabCard.topAnchor.constraint(equalTo: testCenterCard.bottomAnchor, constant: 20),
             vocabCard.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             vocabCard.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
             vocabCard.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -30)
         ])
+    }
+
+    private func createSearchQuickBar() -> UIView {
+        let control = UIControl()
+        control.backgroundColor = .secondarySystemGroupedBackground
+        control.layer.cornerRadius = 14
+        control.layer.borderWidth = 1
+        control.layer.borderColor = UIColor.systemGray4.cgColor
+        control.translatesAutoresizingMaskIntoConstraints = false
+        
+        let icon = UIImageView(image: UIImage(systemName: "magnifyingglass"))
+        icon.tintColor = .systemGray
+        icon.contentMode = .scaleAspectFit
+        icon.isUserInteractionEnabled = false
+        icon.translatesAutoresizingMaskIntoConstraints = false
+        
+        let label = UILabel()
+        label.text = "🔍 Tra cứu Từ vựng, Kanji, Ngữ pháp 50 Bài..."
+        label.font = .systemFont(ofSize: 14, weight: .medium)
+        label.textColor = .secondaryLabel
+        label.isUserInteractionEnabled = false
+        label.translatesAutoresizingMaskIntoConstraints = false
+        
+        control.addSubview(icon)
+        control.addSubview(label)
+        
+        NSLayoutConstraint.activate([
+            control.heightAnchor.constraint(equalToConstant: 46),
+            icon.leadingAnchor.constraint(equalTo: control.leadingAnchor, constant: 14),
+            icon.centerYAnchor.constraint(equalTo: control.centerYAnchor),
+            icon.widthAnchor.constraint(equalToConstant: 20),
+            icon.heightAnchor.constraint(equalToConstant: 20),
+            
+            label.leadingAnchor.constraint(equalTo: icon.trailingAnchor, constant: 10),
+            label.trailingAnchor.constraint(equalTo: control.trailingAnchor, constant: -14),
+            label.centerYAnchor.constraint(equalTo: control.centerYAnchor)
+        ])
+        
+        control.addAction(UIAction(handler: { [weak self] _ in
+            self?.handleSearchTap()
+        }), for: .touchUpInside)
+        
+        return control
+    }
+
+    private func createTestCenterSectionCard() -> UIView {
+        let card = createBaseCard()
+        
+        let badge = UILabel()
+        badge.text = " LUYỆN THI & SỔ TAY "
+        badge.font = .systemFont(ofSize: 11, weight: .bold)
+        badge.textColor = .systemRed
+        badge.backgroundColor = UIColor.systemRed.withAlphaComponent(0.12)
+        badge.layer.cornerRadius = 6
+        badge.clipsToBounds = true
+        badge.translatesAutoresizingMaskIntoConstraints = false
+        
+        let titleLabel = UILabel()
+        titleLabel.text = "Kiểm tra Tính điểm & Sổ tay Từ chưa nhớ"
+        titleLabel.font = .systemFont(ofSize: 18, weight: .bold)
+        titleLabel.textColor = .label
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        
+        let subtitleLabel = UILabel()
+        subtitleLabel.text = "Thi trắc nghiệm tính điểm 100, giải thích ngữ pháp chi tiết và tự động lưu các từ làm sai vào sổ tay ôn tập."
+        subtitleLabel.font = .systemFont(ofSize: 13, weight: .regular)
+        subtitleLabel.textColor = .secondaryLabel
+        subtitleLabel.numberOfLines = 0
+        subtitleLabel.translatesAutoresizingMaskIntoConstraints = false
+        
+        let stack = UIStackView()
+        stack.axis = .vertical
+        stack.spacing = 10
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        
+        // 0. Thi thử JLPT N5 & N4
+        let mockTestRow = createTestOptionRow(
+            title: "Thi thử JLPT N5 & N4 Mô phỏng",
+            detail: "Đề thi 25 câu (Chữ Hán, Ngữ pháp, Nghe hiểu) tính giờ 25 phút & chấm điểm chuẩn thang 180",
+            icon: "clock.badge.checkmark.fill",
+            color: .systemIndigo
+        ) { [weak self] in
+            let vc = JLPTMockTestViewController()
+            self?.navigationController?.pushViewController(vc, animated: true)
+        }
+        
+        // 1. Kiểm tra ngữ pháp
+        let grammarTestRow = createTestOptionRow(
+            title: "Kiểm tra Ngữ pháp Tính điểm",
+            detail: "Trắc nghiệm trợ từ, dạng chia và mẫu câu N5 & N4",
+            icon: "doc.badge.plus",
+            color: .systemTeal
+        ) { [weak self] in
+            let vc = GrammarQuizViewController()
+            self?.navigationController?.pushViewController(vc, animated: true)
+        }
+        
+        // 2. Kiểm tra từ vựng
+        let vocabTestRow = createTestOptionRow(
+            title: "Kiểm tra Từ vựng Tính điểm",
+            detail: "10 câu trắc nghiệm Hán tự, Kana và dịch nghĩa tính giờ",
+            icon: "checkmark.seal.fill",
+            color: .systemPurple
+        ) { [weak self] in
+            let vc = VocabTestViewController()
+            self?.navigationController?.pushViewController(vc, animated: true)
+        }
+        
+        // 3. Sổ tay từ chưa nhớ
+        let reviewWordsRow = createTestOptionRow(
+            title: "Sổ tay Từ chưa nhớ & Đã thuộc",
+            detail: "Xem danh sách từ làm sai, luyện Flashcard và kiểm tra lại",
+            icon: "exclamationmark.triangle.fill",
+            color: .systemOrange
+        ) { [weak self] in
+            let vc = NeedReviewWordsViewController()
+            self?.navigationController?.pushViewController(vc, animated: true)
+        }
+        
+        stack.addArrangedSubview(mockTestRow)
+        stack.addArrangedSubview(grammarTestRow)
+        stack.addArrangedSubview(vocabTestRow)
+        stack.addArrangedSubview(reviewWordsRow)
+        
+        card.addSubview(badge)
+        card.addSubview(titleLabel)
+        card.addSubview(subtitleLabel)
+        card.addSubview(stack)
+        
+        NSLayoutConstraint.activate([
+            badge.topAnchor.constraint(equalTo: card.topAnchor, constant: 16),
+            badge.leadingAnchor.constraint(equalTo: card.leadingAnchor, constant: 18),
+            badge.heightAnchor.constraint(equalToConstant: 22),
+            
+            titleLabel.topAnchor.constraint(equalTo: badge.bottomAnchor, constant: 8),
+            titleLabel.leadingAnchor.constraint(equalTo: card.leadingAnchor, constant: 18),
+            titleLabel.trailingAnchor.constraint(equalTo: card.trailingAnchor, constant: -18),
+            
+            subtitleLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 6),
+            subtitleLabel.leadingAnchor.constraint(equalTo: card.leadingAnchor, constant: 18),
+            subtitleLabel.trailingAnchor.constraint(equalTo: card.trailingAnchor, constant: -18),
+            
+            stack.topAnchor.constraint(equalTo: subtitleLabel.bottomAnchor, constant: 14),
+            stack.leadingAnchor.constraint(equalTo: card.leadingAnchor, constant: 18),
+            stack.trailingAnchor.constraint(equalTo: card.trailingAnchor, constant: -18),
+            stack.bottomAnchor.constraint(equalTo: card.bottomAnchor, constant: -18)
+        ])
+        
+        return card
+    }
+
+    private func createTestOptionRow(title: String, detail: String, icon: String, color: UIColor, onTap: @escaping () -> Void) -> UIView {
+        let view = UIControl()
+        view.backgroundColor = .secondarySystemGroupedBackground
+        view.layer.cornerRadius = 14
+        view.layer.borderWidth = 1
+        view.layer.borderColor = UIColor.systemGray5.cgColor
+        view.translatesAutoresizingMaskIntoConstraints = false
+        
+        let iconView = UIImageView(image: UIImage(systemName: icon) ?? UIImage(systemName: "book.fill"))
+        iconView.isUserInteractionEnabled = false
+        iconView.tintColor = color
+        iconView.contentMode = .scaleAspectFit
+        iconView.translatesAutoresizingMaskIntoConstraints = false
+        
+        let titleLabel = UILabel()
+        titleLabel.isUserInteractionEnabled = false
+        titleLabel.text = title
+        titleLabel.font = .systemFont(ofSize: 15, weight: .bold)
+        titleLabel.textColor = .label
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        
+        let detailLabel = UILabel()
+        detailLabel.isUserInteractionEnabled = false
+        detailLabel.text = detail
+        detailLabel.font = .systemFont(ofSize: 12, weight: .regular)
+        detailLabel.textColor = .secondaryLabel
+        detailLabel.translatesAutoresizingMaskIntoConstraints = false
+        
+        let arrowView = UIImageView(image: UIImage(systemName: "chevron.right"))
+        arrowView.isUserInteractionEnabled = false
+        arrowView.tintColor = .systemGray3
+        arrowView.contentMode = .scaleAspectFit
+        arrowView.translatesAutoresizingMaskIntoConstraints = false
+        
+        view.addSubview(iconView)
+        view.addSubview(titleLabel)
+        view.addSubview(detailLabel)
+        view.addSubview(arrowView)
+        
+        NSLayoutConstraint.activate([
+            view.heightAnchor.constraint(equalToConstant: 62),
+            
+            iconView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 14),
+            iconView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            iconView.widthAnchor.constraint(equalToConstant: 24),
+            iconView.heightAnchor.constraint(equalToConstant: 24),
+            
+            arrowView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -14),
+            arrowView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            arrowView.widthAnchor.constraint(equalToConstant: 12),
+            arrowView.heightAnchor.constraint(equalToConstant: 16),
+            
+            titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 12),
+            titleLabel.leadingAnchor.constraint(equalTo: iconView.trailingAnchor, constant: 12),
+            titleLabel.trailingAnchor.constraint(equalTo: arrowView.leadingAnchor, constant: -8),
+            
+            detailLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 2),
+            detailLabel.leadingAnchor.constraint(equalTo: iconView.trailingAnchor, constant: 12),
+            detailLabel.trailingAnchor.constraint(equalTo: arrowView.leadingAnchor, constant: -8)
+        ])
+        
+        view.addAction(UIAction(handler: { _ in
+            onTap()
+        }), for: .touchUpInside)
+        
+        return view
     }
     
     private func createKanaSectionCard(title: String, subtitle: String, accentColor: UIColor, kanaType: KanaType) -> UIView {
@@ -124,7 +434,7 @@ class ViewController: UIViewController {
         let flashcardBtn = UIButton(type: .system)
         var fcConfig = UIButton.Configuration.filled()
         fcConfig.title = "Flashcard"
-        fcConfig.image = UIImage(systemName: "menucard")
+        fcConfig.image = UIImage(systemName: "menucard.fill")
         fcConfig.imagePlacement = .leading
         fcConfig.imagePadding = 6
         fcConfig.baseBackgroundColor = accentColor
@@ -186,7 +496,7 @@ class ViewController: UIViewController {
         let card = createBaseCard()
         
         let badge = UILabel()
-        badge.text = " JLPT N5 • HÁN TỰ "
+        badge.text = " JLPT N5 & N4 "
         badge.font = .systemFont(ofSize: 11, weight: .bold)
         badge.textColor = accentColor
         badge.backgroundColor = accentColor.withAlphaComponent(0.12)
@@ -209,7 +519,7 @@ class ViewController: UIViewController {
         
         let flashcardBtn = UIButton(type: .system)
         var fcConfig = UIButton.Configuration.filled()
-        fcConfig.title = "Flashcard"
+        fcConfig.title = "Flashcard Hán tự"
         fcConfig.image = UIImage(systemName: "character.book.closed.fill")
         fcConfig.imagePlacement = .leading
         fcConfig.imagePadding = 6
@@ -225,8 +535,8 @@ class ViewController: UIViewController {
         
         let quizBtn = UIButton(type: .system)
         var qConfig = UIButton.Configuration.tinted()
-        qConfig.title = "Luyện nghe"
-        qConfig.image = UIImage(systemName: "headphones")
+        qConfig.title = "Luyện trắc nghiệm"
+        qConfig.image = UIImage(systemName: "pencil.and.list.clipboard")
         qConfig.imagePlacement = .leading
         qConfig.imagePadding = 6
         qConfig.baseBackgroundColor = accentColor
@@ -272,46 +582,105 @@ class ViewController: UIViewController {
         
         return card
     }
-    
-    private func createVocabTopicsSectionCard() -> UIView {
+
+    private func createGrammarSectionCard(title: String, subtitle: String, accentColor: UIColor) -> UIView {
+        return createTwoButtonSectionCard(
+            badgeText: " GIÁO TRÌNH MINNA NO NIHONGO (50 BÀI N5 & N4) ",
+            title: title,
+            subtitle: subtitle,
+            accentColor: accentColor,
+            primaryTitle: "50 Bài Ngữ pháp",
+            primaryIcon: "list.bullet.rectangle.portrait.fill",
+            secondaryTitle: "Luyện trắc nghiệm",
+            secondaryIcon: "checkmark.circle.badge.questionmark.fill",
+            primaryAction: { [weak self] in
+                let vc = GrammarLessonListViewController()
+                self?.navigationController?.pushViewController(vc, animated: true)
+            },
+            secondaryAction: { [weak self] in
+                let vc = GrammarQuizViewController()
+                self?.navigationController?.pushViewController(vc, animated: true)
+            }
+        )
+    }
+
+    private func createTwoButtonSectionCard(
+        badgeText: String,
+        title: String,
+        subtitle: String,
+        accentColor: UIColor,
+        primaryTitle: String,
+        primaryIcon: String,
+        secondaryTitle: String,
+        secondaryIcon: String,
+        primaryAction: @escaping () -> Void,
+        secondaryAction: @escaping () -> Void
+    ) -> UIView {
         let card = createBaseCard()
         
         let badge = UILabel()
-        badge.text = " TỪ VỰNG CHỦ ĐỀ N5 "
+        badge.text = badgeText
         badge.font = .systemFont(ofSize: 11, weight: .bold)
-        badge.textColor = .systemPurple
-        badge.backgroundColor = UIColor.systemPurple.withAlphaComponent(0.12)
+        badge.textColor = accentColor
+        badge.backgroundColor = accentColor.withAlphaComponent(0.12)
         badge.layer.cornerRadius = 6
         badge.clipsToBounds = true
         badge.translatesAutoresizingMaskIntoConstraints = false
         
         let titleLabel = UILabel()
-        titleLabel.text = "Từ vựng Giao tiếp theo Chủ đề"
+        titleLabel.text = title
         titleLabel.font = .systemFont(ofSize: 18, weight: .bold)
         titleLabel.textColor = .label
+        titleLabel.numberOfLines = 0
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         
         let subtitleLabel = UILabel()
-        subtitleLabel.text = "Học từ vựng qua ngữ cảnh thực tế với câu ví dụ và luyện nghe chọn nghĩa."
+        subtitleLabel.text = subtitle
         subtitleLabel.font = .systemFont(ofSize: 13, weight: .regular)
         subtitleLabel.textColor = .secondaryLabel
         subtitleLabel.numberOfLines = 0
         subtitleLabel.translatesAutoresizingMaskIntoConstraints = false
         
-        let topicsStack = UIStackView()
-        topicsStack.axis = .vertical
-        topicsStack.spacing = 10
-        topicsStack.translatesAutoresizingMaskIntoConstraints = false
+        let primaryBtn = UIButton(type: .system)
+        var fcConfig = UIButton.Configuration.filled()
+        fcConfig.title = primaryTitle
+        fcConfig.image = UIImage(systemName: primaryIcon)
+        fcConfig.imagePlacement = .leading
+        fcConfig.imagePadding = 6
+        fcConfig.baseBackgroundColor = accentColor
+        fcConfig.baseForegroundColor = .white
+        primaryBtn.configuration = fcConfig
+        primaryBtn.layer.cornerRadius = 12
+        primaryBtn.clipsToBounds = true
+        primaryBtn.addAction(UIAction(handler: { _ in
+            primaryAction()
+        }), for: .touchUpInside)
         
-        for topic in VocabRepository.shared.topics {
-            let row = createTopicRow(topic: topic)
-            topicsStack.addArrangedSubview(row)
-        }
+        let secondaryBtn = UIButton(type: .system)
+        var qConfig = UIButton.Configuration.tinted()
+        qConfig.title = secondaryTitle
+        qConfig.image = UIImage(systemName: secondaryIcon)
+        qConfig.imagePlacement = .leading
+        qConfig.imagePadding = 6
+        qConfig.baseBackgroundColor = accentColor
+        qConfig.baseForegroundColor = accentColor
+        secondaryBtn.configuration = qConfig
+        secondaryBtn.layer.cornerRadius = 12
+        secondaryBtn.clipsToBounds = true
+        secondaryBtn.addAction(UIAction(handler: { _ in
+            secondaryAction()
+        }), for: .touchUpInside)
+        
+        let btnStack = UIStackView(arrangedSubviews: [primaryBtn, secondaryBtn])
+        btnStack.axis = .horizontal
+        btnStack.distribution = .fillEqually
+        btnStack.spacing = 12
+        btnStack.translatesAutoresizingMaskIntoConstraints = false
         
         card.addSubview(badge)
         card.addSubview(titleLabel)
         card.addSubview(subtitleLabel)
-        card.addSubview(topicsStack)
+        card.addSubview(btnStack)
         
         NSLayoutConstraint.activate([
             badge.topAnchor.constraint(equalTo: card.topAnchor, constant: 16),
@@ -326,7 +695,115 @@ class ViewController: UIViewController {
             subtitleLabel.leadingAnchor.constraint(equalTo: card.leadingAnchor, constant: 18),
             subtitleLabel.trailingAnchor.constraint(equalTo: card.trailingAnchor, constant: -18),
             
-            topicsStack.topAnchor.constraint(equalTo: subtitleLabel.bottomAnchor, constant: 16),
+            btnStack.topAnchor.constraint(equalTo: subtitleLabel.bottomAnchor, constant: 16),
+            btnStack.leadingAnchor.constraint(equalTo: card.leadingAnchor, constant: 18),
+            btnStack.trailingAnchor.constraint(equalTo: card.trailingAnchor, constant: -18),
+            btnStack.bottomAnchor.constraint(equalTo: card.bottomAnchor, constant: -18),
+            btnStack.heightAnchor.constraint(equalToConstant: 44)
+        ])
+        
+        return card
+    }
+    
+    private func createVocabTopicsSectionCard() -> UIView {
+        let card = createBaseCard()
+        
+        let badge = UILabel()
+        badge.text = " TỪ VỰNG 50 BÀI (N5 & N4) & CHỦ ĐỀ "
+        badge.font = .systemFont(ofSize: 11, weight: .bold)
+        badge.textColor = .systemPurple
+        badge.backgroundColor = UIColor.systemPurple.withAlphaComponent(0.12)
+        badge.layer.cornerRadius = 6
+        badge.clipsToBounds = true
+        badge.translatesAutoresizingMaskIntoConstraints = false
+        
+        let titleLabel = UILabel()
+        titleLabel.text = "Từ vựng 50 Bài Minna & Chủ đề (語彙)"
+        titleLabel.font = .systemFont(ofSize: 18, weight: .bold)
+        titleLabel.textColor = .label
+        titleLabel.numberOfLines = 0
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        
+        let subtitleLabel = UILabel()
+        subtitleLabel.text = "Trọn bộ 50 bài từ vựng Minna no Nihongo I & II kèm nhóm động từ【I / II / III】, trợ từ đi kèm và 5 chủ đề giao tiếp thực tế."
+        subtitleLabel.font = .systemFont(ofSize: 13, weight: .regular)
+        subtitleLabel.textColor = .secondaryLabel
+        subtitleLabel.numberOfLines = 0
+        subtitleLabel.translatesAutoresizingMaskIntoConstraints = false
+
+        let lessonsBtn = UIButton(type: .system)
+        var fcConfig = UIButton.Configuration.filled()
+        fcConfig.title = "50 Bài từ vựng"
+        fcConfig.image = UIImage(systemName: "books.vertical.fill")
+        fcConfig.imagePlacement = .leading
+        fcConfig.imagePadding = 6
+        fcConfig.baseBackgroundColor = .systemPurple
+        fcConfig.baseForegroundColor = .white
+        lessonsBtn.configuration = fcConfig
+        lessonsBtn.layer.cornerRadius = 12
+        lessonsBtn.clipsToBounds = true
+        lessonsBtn.addAction(UIAction(handler: { [weak self] _ in
+            let vc = VocabLessonListViewController()
+            self?.navigationController?.pushViewController(vc, animated: true)
+        }), for: .touchUpInside)
+
+        let quizBtn = UIButton(type: .system)
+        var qConfig = UIButton.Configuration.tinted()
+        qConfig.title = "Luyện nghe 50 Bài"
+        qConfig.image = UIImage(systemName: "headphones")
+        qConfig.imagePlacement = .leading
+        qConfig.imagePadding = 6
+        qConfig.baseBackgroundColor = .systemPurple
+        qConfig.baseForegroundColor = .systemPurple
+        quizBtn.configuration = qConfig
+        quizBtn.layer.cornerRadius = 12
+        quizBtn.clipsToBounds = true
+        quizBtn.addAction(UIAction(handler: { [weak self] _ in
+            let vc = VocabQuizViewController(customTitle: "50 Bài Minna", words: VocabRepository.shared.getAllLessonWords())
+            self?.navigationController?.pushViewController(vc, animated: true)
+        }), for: .touchUpInside)
+
+        let actionStack = UIStackView(arrangedSubviews: [lessonsBtn, quizBtn])
+        actionStack.axis = .horizontal
+        actionStack.distribution = .fillEqually
+        actionStack.spacing = 12
+        actionStack.translatesAutoresizingMaskIntoConstraints = false
+        
+        let topicsStack = UIStackView()
+        topicsStack.axis = .vertical
+        topicsStack.spacing = 10
+        topicsStack.translatesAutoresizingMaskIntoConstraints = false
+        
+        for topic in VocabRepository.shared.topics {
+            let row = createTopicRow(topic: topic)
+            topicsStack.addArrangedSubview(row)
+        }
+        
+        card.addSubview(badge)
+        card.addSubview(titleLabel)
+        card.addSubview(subtitleLabel)
+        card.addSubview(actionStack)
+        card.addSubview(topicsStack)
+        
+        NSLayoutConstraint.activate([
+            badge.topAnchor.constraint(equalTo: card.topAnchor, constant: 16),
+            badge.leadingAnchor.constraint(equalTo: card.leadingAnchor, constant: 18),
+            badge.heightAnchor.constraint(equalToConstant: 22),
+            
+            titleLabel.topAnchor.constraint(equalTo: badge.bottomAnchor, constant: 8),
+            titleLabel.leadingAnchor.constraint(equalTo: card.leadingAnchor, constant: 18),
+            titleLabel.trailingAnchor.constraint(equalTo: card.trailingAnchor, constant: -18),
+            
+            subtitleLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 6),
+            subtitleLabel.leadingAnchor.constraint(equalTo: card.leadingAnchor, constant: 18),
+            subtitleLabel.trailingAnchor.constraint(equalTo: card.trailingAnchor, constant: -18),
+
+            actionStack.topAnchor.constraint(equalTo: subtitleLabel.bottomAnchor, constant: 14),
+            actionStack.leadingAnchor.constraint(equalTo: card.leadingAnchor, constant: 18),
+            actionStack.trailingAnchor.constraint(equalTo: card.trailingAnchor, constant: -18),
+            actionStack.heightAnchor.constraint(equalToConstant: 44),
+            
+            topicsStack.topAnchor.constraint(equalTo: actionStack.bottomAnchor, constant: 14),
             topicsStack.leadingAnchor.constraint(equalTo: card.leadingAnchor, constant: 18),
             topicsStack.trailingAnchor.constraint(equalTo: card.trailingAnchor, constant: -18),
             topicsStack.bottomAnchor.constraint(equalTo: card.bottomAnchor, constant: -18)

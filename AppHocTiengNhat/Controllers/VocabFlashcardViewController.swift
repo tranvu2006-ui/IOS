@@ -7,7 +7,9 @@ import UIKit
 
 public class VocabFlashcardViewController: UIViewController {
     
-    private let topic: VocabTopic
+    private let topic: VocabTopic?
+    private let lesson: VocabLesson?
+    private let customTitle: String?
     private var words: [VocabWord] = []
     private var currentIndex: Int = 0
     
@@ -21,20 +23,50 @@ public class VocabFlashcardViewController: UIViewController {
     
     public init(topic: VocabTopic) {
         self.topic = topic
+        self.lesson = nil
+        self.customTitle = nil
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    public init(lesson: VocabLesson) {
+        self.topic = nil
+        self.lesson = lesson
+        self.customTitle = nil
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    public init(customTitle: String, words: [VocabWord]) {
+        self.topic = nil
+        self.lesson = nil
+        self.customTitle = customTitle
+        self.words = words
         super.init(nibName: nil, bundle: nil)
     }
     
     required init?(coder: NSCoder) {
         self.topic = VocabRepository.shared.topics[0]
+        self.lesson = nil
+        self.customTitle = nil
         super.init(coder: coder)
     }
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        title = topic.title
+        if let topic = topic {
+            title = topic.title
+            words = VocabRepository.shared.getWords(for: topic.id)
+        } else if let lesson = lesson {
+            title = "Bài \(lesson.lessonNumber) (\(lesson.jlptLevel))"
+            words = lesson.words
+        } else {
+            title = customTitle ?? "Flashcard 50 Bài"
+            if words.isEmpty {
+                words = VocabRepository.shared.getAllLessonWords()
+            }
+        }
         view.backgroundColor = .systemGroupedBackground
+        navigationItem.largeTitleDisplayMode = .never
         
-        words = VocabRepository.shared.getWords(for: topic.id)
         setupUI()
         setupGestures()
         updateCard()
@@ -188,20 +220,37 @@ public class VocabFlashcardViewController: UIViewController {
     }
     
     private func showCompletionAlert() {
+        let contextTitle: String
+        if let topic = topic {
+            contextTitle = "chủ đề '\(topic.title)'"
+        } else if let lesson = lesson {
+            contextTitle = "Bài \(lesson.lessonNumber): \(lesson.title)"
+        } else {
+            contextTitle = customTitle ?? "50 Bài Minna no Nihongo"
+        }
+
         let alert = UIAlertController(
-            title: "Hoàn thành chủ đề! 🎉",
-            message: "Bạn đã ôn tập xong các từ vựng thuộc chủ đề '\(topic.title)'.",
+            title: "Hoàn thành! 🎉",
+            message: "Bạn đã ôn tập xong từ vựng của \(contextTitle).",
             preferredStyle: .alert
         )
         alert.addAction(UIAlertAction(title: "Học lại", style: .default, handler: { [weak self] _ in
             self?.currentIndex = 0
             self?.updateCard()
         }))
-        alert.addAction(UIAlertAction(title: "Luyện nghe chủ đề", style: .default, handler: { [weak self] _ in
+        alert.addAction(UIAlertAction(title: "Luyện nghe & Nghĩa", style: .default, handler: { [weak self] _ in
             guard let self = self else { return }
-            let quizVC = VocabQuizViewController(topic: self.topic)
+            let quizVC: VocabQuizViewController
+            if let topic = self.topic {
+                quizVC = VocabQuizViewController(topic: topic)
+            } else if let lesson = self.lesson {
+                quizVC = VocabQuizViewController(lesson: lesson)
+            } else {
+                quizVC = VocabQuizViewController(customTitle: self.customTitle ?? "Tổng hợp 50 Bài", words: self.words)
+            }
             self.navigationController?.pushViewController(quizVC, animated: true)
         }))
+        alert.addAction(UIAlertAction(title: "Đóng", style: .cancel))
         present(alert, animated: true)
     }
 }

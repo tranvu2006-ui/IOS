@@ -7,7 +7,9 @@ import UIKit
 
 public class VocabQuizViewController: UIViewController {
     
-    private let topic: VocabTopic
+    private let topic: VocabTopic?
+    private let lesson: VocabLesson?
+    private let customTitle: String?
     private var allWordsInTopic: [VocabWord] = []
     private var quizList: [VocabWord] = []
     private var currentIndex: Int = 0
@@ -30,20 +32,50 @@ public class VocabQuizViewController: UIViewController {
     
     public init(topic: VocabTopic) {
         self.topic = topic
+        self.lesson = nil
+        self.customTitle = nil
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    public init(lesson: VocabLesson) {
+        self.topic = nil
+        self.lesson = lesson
+        self.customTitle = nil
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    public init(customTitle: String, words: [VocabWord]) {
+        self.topic = nil
+        self.lesson = nil
+        self.customTitle = customTitle
+        self.allWordsInTopic = words
         super.init(nibName: nil, bundle: nil)
     }
     
     required init?(coder: NSCoder) {
         self.topic = VocabRepository.shared.topics[0]
+        self.lesson = nil
+        self.customTitle = nil
         super.init(coder: coder)
     }
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Nghe: \(topic.title)"
+        if let topic = topic {
+            title = "Nghe: \(topic.title)"
+            allWordsInTopic = VocabRepository.shared.getWords(for: topic.id)
+        } else if let lesson = lesson {
+            title = "Quiz Bài \(lesson.lessonNumber) (\(lesson.jlptLevel))"
+            allWordsInTopic = lesson.words
+        } else {
+            title = "Nghe: \(customTitle ?? "50 Bài Minna")"
+            if allWordsInTopic.isEmpty {
+                allWordsInTopic = VocabRepository.shared.getAllLessonWords()
+            }
+        }
         view.backgroundColor = .systemGroupedBackground
+        navigationItem.largeTitleDisplayMode = .never
         
-        allWordsInTopic = VocabRepository.shared.getWords(for: topic.id)
         setupUI()
         startNewQuizSession()
     }
@@ -167,7 +199,11 @@ public class VocabQuizViewController: UIViewController {
     private func startNewQuizSession() {
         score = 0
         currentIndex = 0
-        quizList = allWordsInTopic.shuffled()
+        if allWordsInTopic.count > 15 {
+            quizList = Array(allWordsInTopic.shuffled().prefix(15))
+        } else {
+            quizList = allWordsInTopic.shuffled()
+        }
         loadQuestion()
     }
     

@@ -10,10 +10,12 @@ public struct KanjiQuizItem {
     public let reading: String
     public let meaning: String
     public let correctKanji: String
+    public let jlptLevel: String
 }
 
 public class KanjiQuizViewController: UIViewController {
     
+    private let initialLevel: String?
     private var allQuizItems: [KanjiQuizItem] = []
     private var currentQuizList: [KanjiQuizItem] = []
     private var currentIndex: Int = 0
@@ -25,6 +27,7 @@ public class KanjiQuizViewController: UIViewController {
     private var isAnswerLocked: Bool = false
     
     // UI Elements
+    private let segmentedControl = UISegmentedControl(items: ["Tất cả (N5 & N4)", "Kanji N5", "Kanji N4"])
     private let progressView = UIProgressView(progressViewStyle: .default)
     private let headerLabel = UILabel()
     private let scoreBadgeLabel = UILabel()
@@ -35,26 +38,62 @@ public class KanjiQuizViewController: UIViewController {
     
     private let optionsStackView = UIStackView()
     
+    public init(level: String? = nil) {
+        self.initialLevel = level
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        self.initialLevel = nil
+        super.init(coder: coder)
+    }
+    
     public override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Luyện nghe Kanji N5"
+        title = "Trắc nghiệm Kanji (N5 & N4)"
         view.backgroundColor = .systemGroupedBackground
         
-        buildQuizDatabase()
+        setupSegmentedIndex()
         setupUI()
+        buildQuizDatabase()
         startNewQuizSession()
+    }
+
+    private func setupSegmentedIndex() {
+        if let lvl = initialLevel?.uppercased() {
+            if lvl == "N5" {
+                segmentedControl.selectedSegmentIndex = 1
+            } else if lvl == "N4" {
+                segmentedControl.selectedSegmentIndex = 2
+            } else {
+                segmentedControl.selectedSegmentIndex = 0
+            }
+        } else {
+            segmentedControl.selectedSegmentIndex = 0
+        }
     }
     
     private func buildQuizDatabase() {
         allQuizItems.removeAll()
-        for kanji in KanjiRepository.shared.n5KanjiList {
+        let kanjiPool: [KanjiCharacter]
+        switch segmentedControl.selectedSegmentIndex {
+        case 1:
+            kanjiPool = KanjiRepository.shared.n5KanjiList
+        case 2:
+            kanjiPool = KanjiRepository.shared.n4KanjiList
+        default:
+            kanjiPool = KanjiRepository.shared.allKanji
+        }
+
+        for kanji in kanjiPool {
             for example in kanji.examples {
                 allQuizItems.append(
                     KanjiQuizItem(
                         word: example.word,
                         reading: example.reading,
                         meaning: example.meaning,
-                        correctKanji: kanji.kanji
+                        correctKanji: kanji.kanji,
+                        jlptLevel: kanji.jlptLevel
                     )
                 )
             }
@@ -62,6 +101,13 @@ public class KanjiQuizViewController: UIViewController {
     }
     
     private func setupUI() {
+        segmentedControl.translatesAutoresizingMaskIntoConstraints = false
+        segmentedControl.selectedSegmentTintColor = .systemOrange
+        segmentedControl.setTitleTextAttributes([.foregroundColor: UIColor.white, .font: UIFont.systemFont(ofSize: 13, weight: .bold)], for: .selected)
+        segmentedControl.setTitleTextAttributes([.foregroundColor: UIColor.label, .font: UIFont.systemFont(ofSize: 13, weight: .medium)], for: .normal)
+        segmentedControl.addTarget(self, action: #selector(didChangeSegment), for: .valueChanged)
+        view.addSubview(segmentedControl)
+
         // Progress view
         progressView.translatesAutoresizingMaskIntoConstraints = false
         progressView.progressTintColor = .systemOrange
@@ -121,18 +167,31 @@ public class KanjiQuizViewController: UIViewController {
         view.addSubview(optionsStackView)
         
         for i in 0..<4 {
-            let button = createOptionButton(tag: i)
+            let button = UIButton(type: .system)
+            button.tag = i
+            button.layer.cornerRadius = 14
+            button.layer.borderWidth = 1.5
+            button.layer.borderColor = UIColor.systemGray5.cgColor
+            button.backgroundColor = .systemBackground
+            button.contentHorizontalAlignment = .leading
+            button.configuration?.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 16, bottom: 10, trailing: 16)
+            button.addTarget(self, action: #selector(didSelectOption(_:)), for: .touchUpInside)
             optionButtons.append(button)
             optionsStackView.addArrangedSubview(button)
         }
         
         NSLayoutConstraint.activate([
-            progressView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
+            segmentedControl.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
+            segmentedControl.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            segmentedControl.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            segmentedControl.heightAnchor.constraint(equalToConstant: 34),
+
+            progressView.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: 10),
             progressView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             progressView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             progressView.heightAnchor.constraint(equalToConstant: 6),
             
-            headerLabel.topAnchor.constraint(equalTo: progressView.bottomAnchor, constant: 14),
+            headerLabel.topAnchor.constraint(equalTo: progressView.bottomAnchor, constant: 12),
             headerLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             
             scoreBadgeLabel.centerYAnchor.constraint(equalTo: headerLabel.centerYAnchor),
@@ -140,41 +199,30 @@ public class KanjiQuizViewController: UIViewController {
             scoreBadgeLabel.heightAnchor.constraint(equalToConstant: 28),
             scoreBadgeLabel.widthAnchor.constraint(greaterThanOrEqualToConstant: 80),
             
-            soundBoxView.topAnchor.constraint(equalTo: headerLabel.bottomAnchor, constant: 16),
+            soundBoxView.topAnchor.constraint(equalTo: headerLabel.bottomAnchor, constant: 14),
             soundBoxView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             soundBoxView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            soundBoxView.heightAnchor.constraint(equalToConstant: 150),
+            soundBoxView.heightAnchor.constraint(equalToConstant: 130),
             
             replayAudioButton.centerXAnchor.constraint(equalTo: soundBoxView.centerXAnchor),
             replayAudioButton.centerYAnchor.constraint(equalTo: soundBoxView.centerYAnchor, constant: -12),
-            replayAudioButton.widthAnchor.constraint(equalToConstant: 68),
-            replayAudioButton.heightAnchor.constraint(equalToConstant: 68),
+            replayAudioButton.widthAnchor.constraint(equalToConstant: 64),
+            replayAudioButton.heightAnchor.constraint(equalToConstant: 64),
             
-            replayHintLabel.topAnchor.constraint(equalTo: replayAudioButton.bottomAnchor, constant: 10),
-            replayHintLabel.centerXAnchor.constraint(equalTo: soundBoxView.centerXAnchor),
+            replayHintLabel.topAnchor.constraint(equalTo: replayAudioButton.bottomAnchor, constant: 8),
+            replayHintLabel.leadingAnchor.constraint(equalTo: soundBoxView.leadingAnchor, constant: 16),
+            replayHintLabel.trailingAnchor.constraint(equalTo: soundBoxView.trailingAnchor, constant: -16),
             
-            optionsStackView.topAnchor.constraint(equalTo: soundBoxView.bottomAnchor, constant: 20),
+            optionsStackView.topAnchor.constraint(equalTo: soundBoxView.bottomAnchor, constant: 16),
             optionsStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             optionsStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             optionsStackView.bottomAnchor.constraint(lessThanOrEqualTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20)
         ])
     }
-    
-    private func createOptionButton(tag: Int) -> UIButton {
-        let button = UIButton(type: .system)
-        button.tag = tag
-        button.backgroundColor = .systemBackground
-        button.layer.cornerRadius = 16
-        button.layer.borderWidth = 1.5
-        button.layer.borderColor = UIColor.systemGray5.cgColor
-        button.layer.shadowColor = UIColor.black.cgColor
-        button.layer.shadowOpacity = 0.05
-        button.layer.shadowOffset = CGSize(width: 0, height: 2)
-        button.layer.shadowRadius = 4
-        button.contentHorizontalAlignment = .center
-        button.addTarget(self, action: #selector(didSelectOption(_:)), for: .touchUpInside)
-        button.heightAnchor.constraint(equalToConstant: 62).isActive = true
-        return button
+
+    @objc private func didChangeSegment() {
+        buildQuizDatabase()
+        startNewQuizSession()
     }
     
     private func startNewQuizSession() {
@@ -208,11 +256,11 @@ public class KanjiQuizViewController: UIViewController {
             let item = options[index]
             
             var config = UIButton.Configuration.plain()
-            config.title = item.word
-            config.subtitle = "\(item.meaning)"
+            config.title = "\(item.word)  [\(item.correctKanji)]"
+            config.subtitle = "\(item.reading) • \(item.meaning)"
             config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
                 var outgoing = incoming
-                outgoing.font = UIFont.systemFont(ofSize: 20, weight: .bold)
+                outgoing.font = UIFont.systemFont(ofSize: 18, weight: .bold)
                 outgoing.foregroundColor = UIColor.label
                 return outgoing
             }
@@ -281,19 +329,20 @@ public class KanjiQuizViewController: UIViewController {
     
     private func showFinalResults() {
         let percentage = Int((Double(score) / Double(currentQuizList.count)) * 100)
+        let lvl = segmentedControl.titleForSegment(at: segmentedControl.selectedSegmentIndex) ?? "Kanji"
         let message = percentage >= 80 ?
-            "Thần kỳ! Bạn nhận diện âm Kanji N5 rất tốt (\(score)/\(currentQuizList.count))." :
+            "Thần kỳ! Bạn nhận diện âm \(lvl) rất tốt (\(score)/\(currentQuizList.count))." :
             "Bạn đạt \(score)/\(currentQuizList.count). Hãy dùng Flashcard Kanji để củng cố thêm nhé!"
         
         let alert = UIAlertController(
-            title: "Kết quả Kanji: \(percentage)%",
+            title: "Kết quả \(lvl): \(percentage)%",
             message: message,
             preferredStyle: .alert
         )
         alert.addAction(UIAlertAction(title: "Làm lại bài", style: .default, handler: { [weak self] _ in
             self?.startNewQuizSession()
         }))
-        alert.addAction(UIAlertAction(title: "Quay lại Menu", style: .cancel, handler: { [weak self] _ in
+        alert.addAction(UIAlertAction(title: "Quay lại", style: .cancel, handler: { [weak self] _ in
             self?.navigationController?.popViewController(animated: true)
         }))
         present(alert, animated: true)

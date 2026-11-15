@@ -17,12 +17,14 @@ public class VocabFlashcardView: UIView {
     private let favoriteButton = UIButton(type: .system)
     private let mainWordLabel = UILabel()
     private let readingLabel = UILabel()
+    private let frontGrammarNoteLabel = UILabel()
     private let frontAudioButton = UIButton(type: .system)
     private let tapHintLabel = UILabel()
     
     // Back Elements
     private let romajiLabel = UILabel()
     private let meaningLabel = UILabel()
+    private let backGrammarNoteLabel = UILabel()
     private let exampleContainer = UIView()
     private let exampleJpLabel = UILabel()
     private let exampleViLabel = UILabel()
@@ -94,6 +96,15 @@ public class VocabFlashcardView: UIView {
         readingLabel.textColor = .secondaryLabel
         readingLabel.textAlignment = .center
         readingLabel.translatesAutoresizingMaskIntoConstraints = false
+
+        frontGrammarNoteLabel.font = .systemFont(ofSize: 13, weight: .semibold)
+        frontGrammarNoteLabel.textColor = .systemPurple
+        frontGrammarNoteLabel.backgroundColor = UIColor.systemPurple.withAlphaComponent(0.08)
+        frontGrammarNoteLabel.layer.cornerRadius = 8
+        frontGrammarNoteLabel.clipsToBounds = true
+        frontGrammarNoteLabel.textAlignment = .center
+        frontGrammarNoteLabel.numberOfLines = 2
+        frontGrammarNoteLabel.translatesAutoresizingMaskIntoConstraints = false
         
         frontAudioButton.setImage(UIImage(systemName: "speaker.wave.3.fill"), for: .normal)
         frontAudioButton.tintColor = .systemPurple
@@ -102,7 +113,7 @@ public class VocabFlashcardView: UIView {
         frontAudioButton.translatesAutoresizingMaskIntoConstraints = false
         frontAudioButton.addTarget(self, action: #selector(playWordAudio), for: .touchUpInside)
         
-        tapHintLabel.text = "Chạm để xem nghĩa và ví dụ câu"
+        tapHintLabel.text = "Chạm để xem nghĩa, chia thể và ví dụ câu"
         tapHintLabel.font = .systemFont(ofSize: 13, weight: .regular)
         tapHintLabel.textColor = .secondaryLabel
         tapHintLabel.textAlignment = .center
@@ -112,6 +123,7 @@ public class VocabFlashcardView: UIView {
         frontView.addSubview(favoriteButton)
         frontView.addSubview(mainWordLabel)
         frontView.addSubview(readingLabel)
+        frontView.addSubview(frontGrammarNoteLabel)
         frontView.addSubview(frontAudioButton)
         frontView.addSubview(tapHintLabel)
     }
@@ -122,11 +134,17 @@ public class VocabFlashcardView: UIView {
         romajiLabel.textAlignment = .center
         romajiLabel.translatesAutoresizingMaskIntoConstraints = false
         
-        meaningLabel.font = .systemFont(ofSize: 26, weight: .bold)
+        meaningLabel.font = .systemFont(ofSize: 25, weight: .bold)
         meaningLabel.textColor = .label
         meaningLabel.textAlignment = .center
-        meaningLabel.numberOfLines = 2
+        meaningLabel.numberOfLines = 3
         meaningLabel.translatesAutoresizingMaskIntoConstraints = false
+
+        backGrammarNoteLabel.font = .systemFont(ofSize: 13.5, weight: .semibold)
+        backGrammarNoteLabel.textColor = .systemPurple
+        backGrammarNoteLabel.textAlignment = .center
+        backGrammarNoteLabel.numberOfLines = 2
+        backGrammarNoteLabel.translatesAutoresizingMaskIntoConstraints = false
         
         exampleContainer.backgroundColor = .secondarySystemBackground
         exampleContainer.layer.cornerRadius = 14
@@ -153,6 +171,7 @@ public class VocabFlashcardView: UIView {
         
         backView.addSubview(romajiLabel)
         backView.addSubview(meaningLabel)
+        backView.addSubview(backGrammarNoteLabel)
         backView.addSubview(exampleContainer)
     }
     
@@ -172,7 +191,7 @@ public class VocabFlashcardView: UIView {
             topicBadgeLabel.topAnchor.constraint(equalTo: frontView.topAnchor, constant: 18),
             topicBadgeLabel.leadingAnchor.constraint(equalTo: frontView.leadingAnchor, constant: 18),
             topicBadgeLabel.heightAnchor.constraint(equalToConstant: 26),
-            topicBadgeLabel.widthAnchor.constraint(greaterThanOrEqualToConstant: 80),
+            topicBadgeLabel.widthAnchor.constraint(greaterThanOrEqualToConstant: 90),
             
             favoriteButton.centerYAnchor.constraint(equalTo: topicBadgeLabel.centerYAnchor),
             favoriteButton.trailingAnchor.constraint(equalTo: frontView.trailingAnchor, constant: -18),
@@ -180,14 +199,20 @@ public class VocabFlashcardView: UIView {
             favoriteButton.heightAnchor.constraint(equalToConstant: 30),
             
             mainWordLabel.centerXAnchor.constraint(equalTo: frontView.centerXAnchor),
-            mainWordLabel.centerYAnchor.constraint(equalTo: frontView.centerYAnchor, constant: -25),
+            mainWordLabel.centerYAnchor.constraint(equalTo: frontView.centerYAnchor, constant: -40),
             mainWordLabel.leadingAnchor.constraint(equalTo: frontView.leadingAnchor, constant: 16),
             mainWordLabel.trailingAnchor.constraint(equalTo: frontView.trailingAnchor, constant: -16),
             
             readingLabel.topAnchor.constraint(equalTo: mainWordLabel.bottomAnchor, constant: 6),
-            readingLabel.centerXAnchor.constraint(equalTo: frontView.centerXAnchor),
+            readingLabel.leadingAnchor.constraint(equalTo: frontView.leadingAnchor, constant: 16),
+            readingLabel.trailingAnchor.constraint(equalTo: frontView.trailingAnchor, constant: -16),
+
+            frontGrammarNoteLabel.topAnchor.constraint(equalTo: readingLabel.bottomAnchor, constant: 10),
+            frontGrammarNoteLabel.leadingAnchor.constraint(greaterThanOrEqualTo: frontView.leadingAnchor, constant: 20),
+            frontGrammarNoteLabel.trailingAnchor.constraint(lessThanOrEqualTo: frontView.trailingAnchor, constant: -20),
+            frontGrammarNoteLabel.centerXAnchor.constraint(equalTo: frontView.centerXAnchor),
             
-            frontAudioButton.topAnchor.constraint(equalTo: readingLabel.bottomAnchor, constant: 16),
+            frontAudioButton.topAnchor.constraint(equalTo: frontGrammarNoteLabel.bottomAnchor, constant: 14),
             frontAudioButton.centerXAnchor.constraint(equalTo: frontView.centerXAnchor),
             frontAudioButton.widthAnchor.constraint(equalToConstant: 44),
             frontAudioButton.heightAnchor.constraint(equalToConstant: 44),
@@ -197,17 +222,22 @@ public class VocabFlashcardView: UIView {
             tapHintLabel.trailingAnchor.constraint(equalTo: frontView.trailingAnchor, constant: -16),
             
             // Back
-            romajiLabel.topAnchor.constraint(equalTo: backView.topAnchor, constant: 36),
-            romajiLabel.centerXAnchor.constraint(equalTo: backView.centerXAnchor),
+            romajiLabel.topAnchor.constraint(equalTo: backView.topAnchor, constant: 28),
+            romajiLabel.leadingAnchor.constraint(equalTo: backView.leadingAnchor, constant: 16),
+            romajiLabel.trailingAnchor.constraint(equalTo: backView.trailingAnchor, constant: -16),
             
-            meaningLabel.topAnchor.constraint(equalTo: romajiLabel.bottomAnchor, constant: 12),
+            meaningLabel.topAnchor.constraint(equalTo: romajiLabel.bottomAnchor, constant: 10),
             meaningLabel.leadingAnchor.constraint(equalTo: backView.leadingAnchor, constant: 16),
             meaningLabel.trailingAnchor.constraint(equalTo: backView.trailingAnchor, constant: -16),
+
+            backGrammarNoteLabel.topAnchor.constraint(equalTo: meaningLabel.bottomAnchor, constant: 8),
+            backGrammarNoteLabel.leadingAnchor.constraint(equalTo: backView.leadingAnchor, constant: 16),
+            backGrammarNoteLabel.trailingAnchor.constraint(equalTo: backView.trailingAnchor, constant: -16),
             
-            exampleContainer.topAnchor.constraint(equalTo: meaningLabel.bottomAnchor, constant: 24),
+            exampleContainer.topAnchor.constraint(equalTo: backGrammarNoteLabel.bottomAnchor, constant: 16),
             exampleContainer.leadingAnchor.constraint(equalTo: backView.leadingAnchor, constant: 16),
             exampleContainer.trailingAnchor.constraint(equalTo: backView.trailingAnchor, constant: -16),
-            exampleContainer.bottomAnchor.constraint(lessThanOrEqualTo: backView.bottomAnchor, constant: -20),
+            exampleContainer.bottomAnchor.constraint(lessThanOrEqualTo: backView.bottomAnchor, constant: -18),
             
             exampleJpLabel.topAnchor.constraint(equalTo: exampleContainer.topAnchor, constant: 12),
             exampleJpLabel.leadingAnchor.constraint(equalTo: exampleContainer.leadingAnchor, constant: 14),
@@ -229,9 +259,27 @@ public class VocabFlashcardView: UIView {
         self.currentWord = item
         resetFlip(animated: false)
         
-        topicBadgeLabel.text = " \(item.topicId.uppercased()) "
+        if let lessonNumber = item.lessonNumber {
+            let level = lessonNumber <= 25 ? "N5" : "N4"
+            topicBadgeLabel.text = "  BÀI \(lessonNumber) • \(level)  "
+        } else {
+            topicBadgeLabel.text = "  \(item.topicId.uppercased())  "
+        }
         mainWordLabel.text = item.displayText
         readingLabel.text = item.kanji != nil ? item.kana : ""
+
+        if let note = item.grammarNote, !note.isEmpty {
+            frontGrammarNoteLabel.text = " \(note) "
+            frontGrammarNoteLabel.isHidden = false
+            backGrammarNoteLabel.text = note
+            backGrammarNoteLabel.isHidden = false
+        } else {
+            frontGrammarNoteLabel.text = nil
+            frontGrammarNoteLabel.isHidden = true
+            backGrammarNoteLabel.text = nil
+            backGrammarNoteLabel.isHidden = true
+        }
+
         romajiLabel.text = "/\(item.romaji)/"
         meaningLabel.text = item.meaningVi
         

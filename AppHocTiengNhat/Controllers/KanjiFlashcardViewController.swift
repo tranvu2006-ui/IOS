@@ -7,9 +7,11 @@ import UIKit
 
 public class KanjiFlashcardViewController: UIViewController {
     
+    private var allKanjiPool: [KanjiCharacter] = []
     private var kanjiList: [KanjiCharacter] = []
     private var currentIndex: Int = 0
     
+    private let segmentedControl = UISegmentedControl(items: ["Tất cả (68 chữ)", "Kanji N5 (27)", "Kanji N4 (41)"])
     private let progressView = UIProgressView(progressViewStyle: .default)
     private let counterLabel = UILabel()
     private let flashcard = KanjiFlashcardView()
@@ -20,23 +22,33 @@ public class KanjiFlashcardViewController: UIViewController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Flashcard Kanji N5"
+        title = "Hán tự Kanji (N5 & N4)"
         view.backgroundColor = .systemGroupedBackground
         
-        kanjiList = KanjiRepository.shared.n5KanjiList
+        allKanjiPool = KanjiRepository.shared.allKanji
+        kanjiList = allKanjiPool
+        
         setupUI()
         setupGestures()
         updateCard()
     }
     
     private func setupUI() {
+        segmentedControl.selectedSegmentIndex = 0
+        segmentedControl.translatesAutoresizingMaskIntoConstraints = false
+        segmentedControl.selectedSegmentTintColor = .systemOrange
+        segmentedControl.setTitleTextAttributes([.foregroundColor: UIColor.white, .font: UIFont.systemFont(ofSize: 13, weight: .bold)], for: .selected)
+        segmentedControl.setTitleTextAttributes([.foregroundColor: UIColor.label, .font: UIFont.systemFont(ofSize: 13, weight: .medium)], for: .normal)
+        segmentedControl.addTarget(self, action: #selector(didChangeSegment), for: .valueChanged)
+        view.addSubview(segmentedControl)
+
         progressView.translatesAutoresizingMaskIntoConstraints = false
         progressView.progressTintColor = .systemOrange
         progressView.trackTintColor = .systemGray5
         view.addSubview(progressView)
         
         counterLabel.translatesAutoresizingMaskIntoConstraints = false
-        counterLabel.font = .systemFont(ofSize: 15, weight: .medium)
+        counterLabel.font = .systemFont(ofSize: 14, weight: .medium)
         counterLabel.textColor = .secondaryLabel
         counterLabel.textAlignment = .center
         view.addSubview(counterLabel)
@@ -95,29 +107,47 @@ public class KanjiFlashcardViewController: UIViewController {
         view.addSubview(buttonStack)
         
         NSLayoutConstraint.activate([
-            progressView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
+            segmentedControl.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
+            segmentedControl.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            segmentedControl.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            segmentedControl.heightAnchor.constraint(equalToConstant: 34),
+
+            progressView.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: 10),
             progressView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             progressView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             progressView.heightAnchor.constraint(equalToConstant: 6),
             
-            counterLabel.topAnchor.constraint(equalTo: progressView.bottomAnchor, constant: 12),
+            counterLabel.topAnchor.constraint(equalTo: progressView.bottomAnchor, constant: 10),
             counterLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
             flashcard.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            flashcard.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -30),
-            flashcard.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 28),
-            flashcard.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -28),
-            flashcard.heightAnchor.constraint(equalToConstant: 410),
+            flashcard.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -16),
+            flashcard.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
+            flashcard.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
+            flashcard.heightAnchor.constraint(equalToConstant: 420),
             
             speakButton.widthAnchor.constraint(equalToConstant: 50),
             speakButton.heightAnchor.constraint(equalToConstant: 50),
             prevButton.heightAnchor.constraint(equalToConstant: 50),
             nextButton.heightAnchor.constraint(equalToConstant: 50),
             
-            buttonStack.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -30),
-            buttonStack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
-            buttonStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24)
+            buttonStack.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -26),
+            buttonStack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            buttonStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20)
         ])
+    }
+    
+    @objc private func didChangeSegment() {
+        switch segmentedControl.selectedSegmentIndex {
+        case 1:
+            kanjiList = KanjiRepository.shared.n5KanjiList
+        case 2:
+            kanjiList = KanjiRepository.shared.n4KanjiList
+        default:
+            kanjiList = KanjiRepository.shared.allKanji
+        }
+        currentIndex = 0
+        updateCard()
     }
     
     private func setupGestures() {
@@ -136,7 +166,7 @@ public class KanjiFlashcardViewController: UIViewController {
         let item = kanjiList[currentIndex]
         flashcard.configure(with: item)
         
-        counterLabel.text = "\(currentIndex + 1) / \(kanjiList.count)"
+        counterLabel.text = "\(currentIndex + 1) / \(kanjiList.count) chữ Hán"
         let progress = Float(currentIndex + 1) / Float(kanjiList.count)
         progressView.setProgress(progress, animated: true)
         
@@ -182,20 +212,22 @@ public class KanjiFlashcardViewController: UIViewController {
     }
     
     private func showCompletionAlert() {
+        let currentLevel = segmentedControl.titleForSegment(at: segmentedControl.selectedSegmentIndex) ?? "Kanji"
         let alert = UIAlertController(
             title: "Xuất sắc! 🏮",
-            message: "Bạn đã học qua toàn bộ danh sách Hán tự Kanji N5!",
+            message: "Bạn đã ôn tập xong toàn bộ danh sách \(currentLevel)!",
             preferredStyle: .alert
         )
         alert.addAction(UIAlertAction(title: "Học lại từ đầu", style: .default, handler: { [weak self] _ in
             self?.currentIndex = 0
             self?.updateCard()
         }))
-        alert.addAction(UIAlertAction(title: "Luyện nghe Kanji", style: .default, handler: { [weak self] _ in
+        alert.addAction(UIAlertAction(title: "Luyện trắc nghiệm Kanji", style: .default, handler: { [weak self] _ in
             guard let self = self else { return }
-            let quizVC = KanjiQuizViewController()
+            let quizVC = KanjiQuizViewController(level: self.segmentedControl.selectedSegmentIndex == 1 ? "N5" : (self.segmentedControl.selectedSegmentIndex == 2 ? "N4" : nil))
             self.navigationController?.pushViewController(quizVC, animated: true)
         }))
+        alert.addAction(UIAlertAction(title: "Đóng", style: .cancel))
         present(alert, animated: true)
     }
 }

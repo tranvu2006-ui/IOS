@@ -193,7 +193,7 @@ public class KanjiFlashcardView: UIView {
         self.currentKanji = item
         resetFlip(animated: false)
         
-        badgeLabel.text = " JLPT N5 • \(item.strokeCount) Nét "
+        badgeLabel.text = " JLPT \(item.jlptLevel) • \(item.strokeCount) Nét "
         kanjiLabel.text = item.kanji
         hanVietLabel.text = item.hanViet
         
