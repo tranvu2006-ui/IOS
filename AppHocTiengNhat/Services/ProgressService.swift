@@ -62,7 +62,7 @@ public final class ProgressService {
     public func getMasteredWords() -> [VocabWord] {
         let ids = Set(defaults.stringArray(forKey: masteredKey) ?? [])
         guard !ids.isEmpty else { return [] }
-        return VocabRepository.shared.allWords.filter { ids.contains($0.id) }
+        return VocabRepository.shared.vocabList.filter { ids.contains($0.id) }
     }
     
     public func unmarkMastered(id: String) {
@@ -112,7 +112,7 @@ public final class ProgressService {
     public func getNeedReviewWords() -> [VocabWord] {
         let ids = Set(defaults.stringArray(forKey: needReviewKey) ?? [])
         guard !ids.isEmpty else { return [] }
-        return VocabRepository.shared.allWords.filter { ids.contains($0.id) }
+        return VocabRepository.shared.vocabList.filter { ids.contains($0.id) }
     }
     
     // MARK: - Kết quả luyện tập & Điểm thi

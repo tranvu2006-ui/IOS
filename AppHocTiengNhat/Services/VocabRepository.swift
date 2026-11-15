@@ -67,6 +67,9 @@ public final class VocabRepository {
 
     public let lessons: [VocabLesson]
     public let vocabList: [VocabWord]
+    public var allWords: [VocabWord] {
+        return vocabList
+    }
 
     private init() {
         let allLessons =
