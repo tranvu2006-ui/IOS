@@ -48,6 +48,11 @@
 		CEDBB000308B9712003ED601 /* JLPTMockTestModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDBA000308B9712003ED601 /* JLPTMockTestModel.swift */; };
 		CEDBB000308B9712003ED602 /* JLPTMockTestRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDBA000308B9712003ED602 /* JLPTMockTestRepository.swift */; };
 		CEDBB000308B9712003ED603 /* JLPTMockTestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDBA000308B9712003ED603 /* JLPTMockTestViewController.swift */; };
+		CEDBB000308B9712003ED501 /* KanaGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDBA000308B9712003ED501 /* KanaGridView.swift */; };
+		CEDBB000308B9712003ED502 /* KanaChartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDBA000308B9712003ED502 /* KanaChartViewController.swift */; };
+		CEDBB000308B9712003ED510 /* PictureQuizItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDBA000308B9712003ED510 /* PictureQuizItem.swift */; };
+		CEDBB000308B9712003ED511 /* PictureQuizRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDBA000308B9712003ED511 /* PictureQuizRepository.swift */; };
+		CEDBB000308B9712003ED512 /* PictureQuizViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDBA000308B9712003ED512 /* PictureQuizViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -113,6 +118,11 @@
 		CEDBA000308B9712003ED601 /* JLPTMockTestModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models/JLPTMockTestModel.swift"; sourceTree = "<group>"; };
 		CEDBA000308B9712003ED602 /* JLPTMockTestRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Services/JLPTMockTestRepository.swift"; sourceTree = "<group>"; };
 		CEDBA000308B9712003ED603 /* JLPTMockTestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Controllers/JLPTMockTestViewController.swift"; sourceTree = "<group>"; };
+		CEDBA000308B9712003ED501 /* KanaGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views/KanaGridView.swift"; sourceTree = "<group>"; };
+		CEDBA000308B9712003ED502 /* KanaChartViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Controllers/KanaChartViewController.swift"; sourceTree = "<group>"; };
+		CEDBA000308B9712003ED510 /* PictureQuizItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Models/PictureQuizItem.swift"; sourceTree = "<group>"; };
+		CEDBA000308B9712003ED511 /* PictureQuizRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Services/PictureQuizRepository.swift"; sourceTree = "<group>"; };
+		CEDBA000308B9712003ED512 /* PictureQuizViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Controllers/PictureQuizViewController.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -163,6 +173,11 @@
 		CEDB6C13308B9712003ED670 /* AppHocTiengNhat */ = {
 			isa = PBXGroup;
 			children = (
+				CEDBA000308B9712003ED510 /* PictureQuizItem.swift */,
+				CEDBA000308B9712003ED511 /* PictureQuizRepository.swift */,
+				CEDBA000308B9712003ED512 /* PictureQuizViewController.swift */,
+				CEDBA000308B9712003ED501 /* KanaGridView.swift */,
+				CEDBA000308B9712003ED502 /* KanaChartViewController.swift */,
 												CEDBA000308B9712003ED601 /* JLPTMockTestModel.swift */,
 				CEDBA000308B9712003ED602 /* JLPTMockTestRepository.swift */,
 				CEDBA000308B9712003ED603 /* JLPTMockTestViewController.swift */,
@@ -354,6 +369,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CEDBB000308B9712003ED510 /* PictureQuizItem.swift in Sources */,
+				CEDBB000308B9712003ED511 /* PictureQuizRepository.swift in Sources */,
+				CEDBB000308B9712003ED512 /* PictureQuizViewController.swift in Sources */,
+				CEDBB000308B9712003ED501 /* KanaGridView.swift in Sources */,
+				CEDBB000308B9712003ED502 /* KanaChartViewController.swift in Sources */,
 												CEDBB000308B9712003ED601 /* JLPTMockTestModel.swift in Sources */,
 				CEDBB000308B9712003ED602 /* JLPTMockTestRepository.swift in Sources */,
 				CEDBB000308B9712003ED603 /* JLPTMockTestViewController.swift in Sources */,

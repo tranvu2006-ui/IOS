@@ -34,7 +34,7 @@ public class FlashcardViewController: UIViewController, FlashcardViewDelegate {
         title = "Flashcard \(kanaType.rawValue)"
         view.backgroundColor = .systemGroupedBackground
         
-        characters = KanaRepository.shared.getCharacters(for: kanaType)
+        characters = KanaRepository.shared.getCharacters(for: kanaType).shuffled()
         setupUI()
         setupGestures()
         updateCard()

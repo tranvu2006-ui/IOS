@@ -54,15 +54,16 @@ public class VocabFlashcardViewController: UIViewController {
         super.viewDidLoad()
         if let topic = topic {
             title = topic.title
-            words = VocabRepository.shared.getWords(for: topic.id)
+            words = VocabRepository.shared.getWords(for: topic.id).shuffled()
         } else if let lesson = lesson {
             title = "Bài \(lesson.lessonNumber) (\(lesson.jlptLevel))"
-            words = lesson.words
+            words = lesson.words.shuffled()
         } else {
             title = customTitle ?? "Flashcard 50 Bài"
             if words.isEmpty {
                 words = VocabRepository.shared.getAllLessonWords()
             }
+            words = words.shuffled()
         }
         view.backgroundColor = .systemGroupedBackground
         navigationItem.largeTitleDisplayMode = .never

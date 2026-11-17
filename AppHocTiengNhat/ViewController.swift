@@ -11,7 +11,6 @@ class ViewController: UIViewController {
 
     private let scrollView = UIScrollView()
     private let contentView = UIView()
-    private let statsHeader = StatsHeaderView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -89,7 +88,6 @@ class ViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        statsHeader.refresh()
     }
 
     private func setupViews() {
@@ -112,10 +110,6 @@ class ViewController: UIViewController {
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor)
         ])
         
-        // 0. Stats Header
-        statsHeader.translatesAutoresizingMaskIntoConstraints = false
-        contentView.addSubview(statsHeader)
-
         // 0.1 Quick Search Bar
         let searchBarCard = createSearchQuickBar()
         contentView.addSubview(searchBarCard)
@@ -163,11 +157,7 @@ class ViewController: UIViewController {
         contentView.addSubview(vocabCard)
         
         NSLayoutConstraint.activate([
-            statsHeader.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
-            statsHeader.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-            statsHeader.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-
-            searchBarCard.topAnchor.constraint(equalTo: statsHeader.bottomAnchor, constant: 14),
+            searchBarCard.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 14),
             searchBarCard.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             searchBarCard.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
             
@@ -271,7 +261,18 @@ class ViewController: UIViewController {
         stack.spacing = 10
         stack.translatesAutoresizingMaskIntoConstraints = false
         
-        // 0. Thi thử JLPT N5 & N4
+        // 0. Nhìn hình đoán chữ (Hình con chó, con mèo...)
+        let pictureQuizRow = createTestOptionRow(
+            title: "Nhìn hình đoán chữ (Hình ảnh 🐶, 🐱...)",
+            detail: "Nhìn hình con vật, đồ ăn, phương tiện và chọn từ tiếng Nhật tương ứng",
+            icon: "photo.on.rectangle.angled",
+            color: .systemPink
+        ) { [weak self] in
+            let vc = PictureQuizViewController()
+            self?.navigationController?.pushViewController(vc, animated: true)
+        }
+
+        // 1. Thi thử JLPT N5 & N4
         let mockTestRow = createTestOptionRow(
             title: "Thi thử JLPT N5 & N4 Mô phỏng",
             detail: "Đề thi 25 câu (Chữ Hán, Ngữ pháp, Nghe hiểu) tính giờ 25 phút & chấm điểm chuẩn thang 180",
@@ -282,7 +283,7 @@ class ViewController: UIViewController {
             self?.navigationController?.pushViewController(vc, animated: true)
         }
         
-        // 1. Kiểm tra ngữ pháp
+        // 2. Kiểm tra ngữ pháp
         let grammarTestRow = createTestOptionRow(
             title: "Kiểm tra Ngữ pháp Tính điểm",
             detail: "Trắc nghiệm trợ từ, dạng chia và mẫu câu N5 & N4",
@@ -293,10 +294,10 @@ class ViewController: UIViewController {
             self?.navigationController?.pushViewController(vc, animated: true)
         }
         
-        // 2. Kiểm tra từ vựng
+        // 3. Kiểm tra từ vựng
         let vocabTestRow = createTestOptionRow(
             title: "Kiểm tra Từ vựng Tính điểm",
-            detail: "10 câu trắc nghiệm Hán tự, Kana và dịch nghĩa tính giờ",
+            detail: "Trắc nghiệm Hán tự, Kana và dịch nghĩa tính giờ",
             icon: "checkmark.seal.fill",
             color: .systemPurple
         ) { [weak self] in
@@ -304,7 +305,7 @@ class ViewController: UIViewController {
             self?.navigationController?.pushViewController(vc, animated: true)
         }
         
-        // 3. Sổ tay từ chưa nhớ
+        // 4. Sổ tay từ chưa nhớ
         let reviewWordsRow = createTestOptionRow(
             title: "Sổ tay Từ chưa nhớ & Đã thuộc",
             detail: "Xem danh sách từ làm sai, luyện Flashcard và kiểm tra lại",
@@ -315,6 +316,7 @@ class ViewController: UIViewController {
             self?.navigationController?.pushViewController(vc, animated: true)
         }
         
+        stack.addArrangedSubview(pictureQuizRow)
         stack.addArrangedSubview(mockTestRow)
         stack.addArrangedSubview(grammarTestRow)
         stack.addArrangedSubview(vocabTestRow)
@@ -431,12 +433,38 @@ class ViewController: UIViewController {
         subtitleLabel.numberOfLines = 0
         subtitleLabel.translatesAutoresizingMaskIntoConstraints = false
         
+        let chartBtn = UIButton(type: .system)
+        var cConfig = UIButton.Configuration.tinted()
+        cConfig.title = "Bảng chữ"
+        cConfig.image = UIImage(systemName: "tablecells.fill")
+        cConfig.imagePlacement = .leading
+        cConfig.imagePadding = 6
+        cConfig.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
+            var outgoing = incoming
+            outgoing.font = UIFont.systemFont(ofSize: 13, weight: .bold)
+            return outgoing
+        }
+        cConfig.baseBackgroundColor = accentColor
+        cConfig.baseForegroundColor = accentColor
+        chartBtn.configuration = cConfig
+        chartBtn.layer.cornerRadius = 12
+        chartBtn.clipsToBounds = true
+        chartBtn.addAction(UIAction(handler: { [weak self] _ in
+            let vc = KanaChartViewController(initialType: kanaType)
+            self?.navigationController?.pushViewController(vc, animated: true)
+        }), for: .touchUpInside)
+
         let flashcardBtn = UIButton(type: .system)
         var fcConfig = UIButton.Configuration.filled()
-        fcConfig.title = "Flashcard"
+        fcConfig.title = "Thẻ từ"
         fcConfig.image = UIImage(systemName: "menucard.fill")
         fcConfig.imagePlacement = .leading
         fcConfig.imagePadding = 6
+        fcConfig.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
+            var outgoing = incoming
+            outgoing.font = UIFont.systemFont(ofSize: 13, weight: .bold)
+            return outgoing
+        }
         fcConfig.baseBackgroundColor = accentColor
         fcConfig.baseForegroundColor = .white
         flashcardBtn.configuration = fcConfig
@@ -449,10 +477,15 @@ class ViewController: UIViewController {
         
         let quizBtn = UIButton(type: .system)
         var qConfig = UIButton.Configuration.tinted()
-        qConfig.title = "Luyện nghe"
+        qConfig.title = "Nghe âm"
         qConfig.image = UIImage(systemName: "headphones")
         qConfig.imagePlacement = .leading
         qConfig.imagePadding = 6
+        qConfig.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
+            var outgoing = incoming
+            outgoing.font = UIFont.systemFont(ofSize: 13, weight: .bold)
+            return outgoing
+        }
         qConfig.baseBackgroundColor = accentColor
         qConfig.baseForegroundColor = accentColor
         quizBtn.configuration = qConfig
@@ -463,10 +496,10 @@ class ViewController: UIViewController {
             self?.navigationController?.pushViewController(vc, animated: true)
         }), for: .touchUpInside)
         
-        let btnStack = UIStackView(arrangedSubviews: [flashcardBtn, quizBtn])
+        let btnStack = UIStackView(arrangedSubviews: [chartBtn, flashcardBtn, quizBtn])
         btnStack.axis = .horizontal
         btnStack.distribution = .fillEqually
-        btnStack.spacing = 12
+        btnStack.spacing = 8
         btnStack.translatesAutoresizingMaskIntoConstraints = false
         
         card.addSubview(titleLabel)

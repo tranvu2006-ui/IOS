@@ -84,7 +84,8 @@ public class VocabTestViewController: UIViewController {
             pool = VocabRepository.shared.vocabList
         }
         
-        testList = Array(pool.shuffled().prefix(10))
+        // Lấy ngẫu nhiên toàn bộ từ trong danh sách/bài học
+        testList = pool.shuffled()
         showQuestion(at: currentIndex)
     }
     

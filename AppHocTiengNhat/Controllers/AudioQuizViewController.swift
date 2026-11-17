@@ -12,7 +12,10 @@ public class AudioQuizViewController: UIViewController {
     private var quizList: [KanaCharacter] = []
     private var currentIndex: Int = 0
     private var score: Int = 0
-    private let totalQuestions: Int = 10
+    // Luyện nghe toàn bộ bảng chữ cái ngẫu nhiên (46 chữ cơ bản)
+    private var totalQuestions: Int {
+        return allCharacters.count
+    }
     
     private var currentCorrectCharacter: KanaCharacter?
     private var optionButtons: [UIButton] = []
@@ -185,7 +188,8 @@ public class AudioQuizViewController: UIViewController {
     private func startNewQuizSession() {
         score = 0
         currentIndex = 0
-        quizList = Array(allCharacters.shuffled().prefix(totalQuestions))
+        // Trộn ngẫu nhiên TOÀN BỘ bảng chữ cái
+        quizList = allCharacters.shuffled()
         loadQuestion()
     }
     

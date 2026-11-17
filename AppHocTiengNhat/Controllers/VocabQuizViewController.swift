@@ -199,11 +199,8 @@ public class VocabQuizViewController: UIViewController {
     private func startNewQuizSession() {
         score = 0
         currentIndex = 0
-        if allWordsInTopic.count > 15 {
-            quizList = Array(allWordsInTopic.shuffled().prefix(15))
-        } else {
-            quizList = allWordsInTopic.shuffled()
-        }
+        // Lấy ngẫu nhiên toàn bộ từ trong bài/chủ đề
+        quizList = allWordsInTopic.shuffled()
         loadQuestion()
     }
     
